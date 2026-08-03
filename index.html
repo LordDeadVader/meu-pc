@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Checklist do PC</title>
+<meta name="theme-color" content="#05070f" />
+<link rel="manifest" href="manifest.webmanifest" />
+<link rel="icon" href="icon-192.png" />
+<link rel="apple-touch-icon" href="icon-192.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Space+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+<style>
+* { box-sizing: border-box; margin: 0; -webkit-tap-highlight-color: transparent; }
+body {
+  min-height: 100vh; overflow-x: hidden;
+  background: #05070f; color: #dbe4f5;
+  font-family: 'Space Grotesk', system-ui, sans-serif;
+  padding: 0 16px calc(70px + env(safe-area-inset-bottom));
+}
+.nebula { position: fixed; border-radius: 50%; filter: blur(110px); pointer-events: none; z-index: 0; }
+.n1 { width: 480px; height: 480px; top: -140px; right: -120px; background: rgba(109,40,217,.22); }
+.n2 { width: 420px; height: 420px; bottom: -160px; left: -140px; background: rgba(34,211,238,.13); }
+.wrap { max-width: 880px; margin: 0 auto; position: relative; z-index: 1; }
+
+.hud { padding: calc(34px + env(safe-area-inset-top)) 0 28px; }
+.eyebrow { font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: .28em; color: #38e8ff; margin-bottom: 10px; }
+.title { font-family: 'Chakra Petch', sans-serif; font-weight: 700; font-size: clamp(30px, 6.5vw, 52px); letter-spacing: .02em; line-height: 1; }
+.grad { background: linear-gradient(90deg, #38e8ff, #a78bfa); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.stats { display: flex; gap: 30px; flex-wrap: wrap; margin: 24px 0 18px; }
+.statVal { font-family: 'JetBrains Mono', monospace; font-size: 20px; font-weight: 600; display: block; }
+.cyan { color: #38e8ff; } .violet { color: #a78bfa; } .dim { color: #4b5a75; }
+.statLbl { font-size: 10.5px; text-transform: uppercase; letter-spacing: .14em; color: #6b7c99; }
+
+.power { display: flex; align-items: center; gap: 14px; }
+.powerCells { display: flex; gap: 4px; flex: 1; }
+.cell { flex: 1; height: 16px; background: #101a2c; border: 1px solid #1d2c47; transform: skewX(-14deg); transition: all .35s ease; }
+.cell.on { background: linear-gradient(180deg, #38e8ff, #7c5cf0); border-color: #38e8ff; box-shadow: 0 0 10px rgba(56,232,255,.5); }
+.powerPct { font-family: 'JetBrains Mono', monospace; font-size: 14px; color: #38e8ff; min-width: 44px; text-align: right; }
+
+.sec { margin-top: 38px; }
+.secTitle { display: flex; align-items: center; gap: 10px; font-family: 'Chakra Petch', sans-serif; font-size: 13.5px; font-weight: 600; text-transform: uppercase; letter-spacing: .2em; color: #9db0cc; margin-bottom: 14px; }
+.tick { width: 10px; height: 10px; border: 2px solid #38e8ff; transform: rotate(45deg); flex-shrink: 0; }
+.secSum { margin-left: auto; font-family: 'JetBrains Mono', monospace; font-size: 12.5px; color: #a78bfa; letter-spacing: 0; }
+
+.card { position: relative; margin-bottom: 12px; padding: 16px; background: rgba(255,255,255,.035); border: 1px solid rgba(130,180,255,.13); backdrop-filter: blur(8px); border-radius: 10px; transition: border-color .25s, box-shadow .25s; }
+.card.done { border-color: rgba(167,139,250,.4); background: rgba(167,139,250,.05); }
+.corner { position: absolute; width: 14px; height: 14px; border: 2px solid #38e8ff; opacity: .6; }
+.tl { top: -1px; left: -1px; border-right: none; border-bottom: none; border-radius: 6px 0 0 0; }
+.br { bottom: -1px; right: -1px; border-left: none; border-top: none; border-radius: 0 0 6px 0; }
+.card.done .corner { border-color: #a78bfa; }
+
+.cardRow { display: flex; gap: 14px; }
+.thumb { width: 76px; height: 76px; flex-shrink: 0; cursor: pointer; background: #0b1322; border: 1px solid #1d2c47; border-radius: 8px; display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative; }
+.thumb img { width: 100%; height: 100%; object-fit: cover; }
+.thumbPh { color: #2b3d5e; font-size: 26px; }
+.thumbOk { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: rgba(5,7,15,.55); color: #38e8ff; font-size: 30px; font-weight: 700; }
+.pulse { animation: pulse 1s ease infinite; }
+@keyframes pulse { 50% { border-color: #38e8ff; } }
+
+.cardMain { flex: 1; min-width: 0; }
+.nameRow { display: flex; align-items: flex-start; gap: 10px; cursor: pointer; }
+.chk { width: 18px; height: 18px; margin-top: 3px; accent-color: #38e8ff; cursor: pointer; flex-shrink: 0; }
+.nome { font-weight: 600; font-size: 15.5px; line-height: 1.35; flex: 1; }
+.strike { text-decoration: line-through; color: #64789a; }
+.spec { font-size: 11.5px; color: #6b7c99; margin: 4px 0 0 28px; font-family: 'JetBrains Mono', monospace; }
+.del { background: none; border: none; color: #3d5070; cursor: pointer; font-size: 15px; padding: 2px 6px; border-radius: 4px; }
+.del:active { color: #ff5e7a; background: rgba(255,94,122,.1); }
+
+.fields { display: flex; gap: 10px; flex-wrap: wrap; margin: 12px 0 0 28px; }
+.f { flex: 0 1 120px; } .f.grow, .grow { flex: 1 1 240px; }
+.fl { display: block; font-family: 'JetBrains Mono', monospace; font-size: 9.5px; color: #5c6f92; text-transform: uppercase; letter-spacing: .14em; margin-bottom: 4px; }
+.inp { width: 100%; background: #0b1322; border: 1px solid #1d2c47; border-radius: 6px; color: #dbe4f5; padding: 9px 10px; font-size: 13.5px; font-family: 'JetBrains Mono', monospace; }
+.inp:focus { outline: none; border-color: #38e8ff; box-shadow: 0 0 0 3px rgba(56,232,255,.15); }
+.sel { width: auto; font-family: 'Space Grotesk', sans-serif; min-width: 150px; }
+.linkRow { display: flex; gap: 6px; }
+.go { font-family: 'Chakra Petch', sans-serif; font-size: 11.5px; font-weight: 700; letter-spacing: .08em; background: linear-gradient(90deg, #38e8ff, #7c5cf0); color: #05070f; padding: 0 13px; border-radius: 6px; text-decoration: none; display: flex; align-items: center; white-space: nowrap; }
+
+.addBox { border: 1px dashed rgba(56,232,255,.3); border-radius: 10px; padding: 18px 16px; }
+.addRow { display: flex; gap: 8px; flex-wrap: wrap; }
+.add { font-family: 'Chakra Petch', sans-serif; font-weight: 700; font-size: 12.5px; letter-spacing: .08em; background: linear-gradient(90deg, #38e8ff, #7c5cf0); color: #05070f; border: none; padding: 10px 18px; border-radius: 6px; cursor: pointer; }
+
+.foot { margin-top: 44px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; font-size: 11.5px; color: #4b5a75; }
+.reset { background: none; border: 1px solid #24344f; color: #7a8cab; padding: 7px 12px; border-radius: 6px; cursor: pointer; font-size: 11.5px; }
+
+#installBtn { display: none; position: fixed; bottom: calc(18px + env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%); z-index: 50; font-family: 'Chakra Petch', sans-serif; font-weight: 700; font-size: 13px; letter-spacing: .08em; background: linear-gradient(90deg, #38e8ff, #7c5cf0); color: #05070f; border: none; padding: 13px 24px; border-radius: 30px; box-shadow: 0 6px 24px rgba(56,232,255,.35); cursor: pointer; }
+
+input:focus-visible, button:focus-visible, a:focus-visible, select:focus-visible { outline: 2px solid #38e8ff; outline-offset: 2px; }
+@media (max-width: 560px) {
+  .cardRow { flex-direction: row; }
+  .fields { margin-left: 0; } .spec { margin-left: 0; }
+}
+@media (prefers-reduced-motion: reduce) { *, .cell { transition: none !important; animation: none !important; } }
+</style>
+</head>
+<body>
+<div class="nebula n1"></div><div class="nebula n2"></div>
+
+<div class="wrap">
+  <header class="hud">
+    <div class="eyebrow">// BUILD PROTOCOL · ARES XII</div>
+    <h1 class="title">MONTAGEM<span class="grad"> EM CURSO</span></h1>
+    <div class="stats">
+      <div><span class="statVal" id="stEst"></span><span class="statLbl">orçamento total</span></div>
+      <div><span class="statVal cyan" id="stPago"></span><span class="statLbl">já investido</span></div>
+      <div><span class="statVal violet" id="stQtd"></span><span class="statLbl">peças na mão</span></div>
+    </div>
+    <div class="power">
+      <div class="powerCells" id="powerCells"></div>
+      <span class="powerPct" id="powerPct"></span>
+    </div>
+  </header>
+
+  <main id="lista"></main>
+
+  <section class="sec addBox">
+    <h2 class="secTitle"><span class="tick"></span>Adicionar componente</h2>
+    <div class="addRow">
+      <select class="inp sel" id="novoCat"></select>
+      <input class="inp grow" id="novoNome" placeholder="ex.: fans extras, mousepad, cabo DisplayPort…" />
+      <button class="add" id="btnAdd">+ INSTALAR NA LISTA</button>
+    </div>
+  </section>
+
+  <footer class="foot">
+    <button class="reset" id="btnReset">restaurar lista original</button>
+    <span>salvo no dispositivo · valores de referência ago/2026</span>
+  </footer>
+</div>
+
+<button id="installBtn">⬇ INSTALAR APP</button>
+
+<script>
+const SEED = [
+  { cat: "Núcleo", nome: "Intel Core i5-14400F", spec: "10 núcleos / 16 threads · 4.7GHz Turbo · LGA1700", est: 1100 },
+  { cat: "Núcleo", nome: "Placa-mãe ASRock H610M-HVS/M.2 R2.0", spec: "DDR4 · LGA1700 · M-ATX · chipset H610", est: 550 },
+  { cat: "Núcleo", nome: "Memória 2x Mancer Vant S 8GB DDR4 3200MHz", spec: "16GB total · C19 · dual channel", est: 330 },
+  { cat: "Núcleo", nome: "SSD MSI Spatium M371 500GB NVMe", spec: "M.2 2280 · leitura 2200MB/s", est: 280 },
+  { cat: "Núcleo", nome: "Placa de vídeo Radeon RX 7650 GRE 8GB", spec: "Aisurix · GDDR6 · 128-bit", est: 1900 },
+  { cat: "Energia & Estrutura", nome: "Fonte Aigo Darkflash AT550 550W", spec: "80 Plus Bronze · PFC ativo", est: 300 },
+  { cat: "Energia & Estrutura", nome: "Gabinete Mancer Ward V3 Mini-Tower", spec: "lateral de vidro · 3 fans inclusos", est: 250 },
+  { cat: "Energia & Estrutura", nome: "Cooler TGT M1 90mm", spec: "cooler de entrada — suficiente pro 14400F", est: 60 },
+  { cat: "Energia & Estrutura", nome: "Cabo HDMI 1.8m + cabo de força", spec: "itens básicos de conexão", est: 50 },
+  { cat: "Periféricos", nome: "Monitor 27\" IPS", spec: "1080p ou 1440p · 75Hz+", est: 1100 },
+  { cat: "Periféricos", nome: "Teclado", spec: "", est: 250 },
+  { cat: "Periféricos", nome: "Mouse", spec: "", est: 150 },
+  { cat: "Periféricos", nome: "Headset", spec: "", est: 250 },
+  { cat: "Periféricos", nome: "Filtro de linha / nobreak", spec: "proteção da rede elétrica", est: 150 },
+].map((p, i) => Object.assign({ id: "s" + i, comprado: false, pago: "", link: "", img: "" }, p));
+
+const KEY = "pcbuild:lista:v2";
+const CATS_FIXAS = ["Núcleo", "Energia & Estrutura", "Periféricos", "Extras"];
+let itens;
+try { itens = JSON.parse(localStorage.getItem(KEY)) || SEED; } catch { itens = SEED; }
+
+const fmt = v => new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(v || 0);
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(itens)); } catch (e) { console.error(e); } };
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
+async function fetchImage(link) {
+  try {
+    const r = await fetch("https://api.microlink.io/?url=" + encodeURIComponent(link));
+    const d = await r.json();
+    const img = (d.data && d.data.image && d.data.image.url) || (d.data && d.data.logo && d.data.logo.url);
+    if (img) return img;
+  } catch (e) {}
+  try { return "https://www.google.com/s2/favicons?domain=" + new URL(link).hostname + "&sz=128"; } catch (e) {}
+  return "";
+}
+
+function render() {
+  const cats = [...new Set(itens.map(i => i.cat))];
+  const totalEst = itens.reduce((s, i) => s + (parseFloat(i.est) || 0), 0);
+  const totalPago = itens.filter(i => i.comprado).reduce((s, i) => s + (parseFloat(i.pago || i.est) || 0), 0);
+  const comprados = itens.filter(i => i.comprado).length;
+  const pct = itens.length ? Math.round(comprados / itens.length * 100) : 0;
+
+  document.getElementById("stEst").textContent = fmt(totalEst);
+  document.getElementById("stPago").textContent = fmt(totalPago);
+  document.getElementById("stQtd").innerHTML = comprados + '<span class="dim">/' + itens.length + "</span>";
+  document.getElementById("powerPct").textContent = pct + "%";
+
+  const cells = 20, filled = Math.round(pct / 100 * cells);
+  document.getElementById("powerCells").innerHTML = Array.from({ length: cells }, (_, i) =>
+    '<span class="cell' + (i < filled ? " on" : "") + '" style="transition-delay:' + i * 30 + 'ms"></span>').join("");
+
+  document.getElementById("lista").innerHTML = cats.map(cat => {
+    const soma = itens.filter(i => i.cat === cat).reduce((s, i) => s + (parseFloat(i.est) || 0), 0);
+    return '<section class="sec"><h2 class="secTitle"><span class="tick"></span>' + esc(cat) +
+      '<span class="secSum">' + fmt(soma) + "</span></h2>" +
+      itens.filter(i => i.cat === cat).map(it => cardHTML(it)).join("") + "</section>";
+  }).join("");
+
+  const sel = document.getElementById("novoCat");
+  const opts = [...new Set([...cats, ...CATS_FIXAS])];
+  sel.innerHTML = opts.map(c => '<option' + (c === sel.dataset.val ? " selected" : "") + ">" + esc(c) + "</option>").join("");
+}
+
+function cardHTML(it) {
+  return '<article class="card' + (it.comprado ? " done" : "") + '" data-id="' + it.id + '">' +
+    '<span class="corner tl"></span><span class="corner br"></span>' +
+    '<div class="cardRow">' +
+    '<div class="thumb" data-act="toggle">' +
+      (it.img ? '<img src="' + esc(it.img) + '" alt="" onerror="this.style.display=\'none\'">' : '<span class="thumbPh">◈</span>') +
+      (it.comprado ? '<span class="thumbOk">✓</span>' : "") +
+    "</div>" +
+    '<div class="cardMain">' +
+      '<label class="nameRow">' +
+        '<input type="checkbox" class="chk" data-act="check"' + (it.comprado ? " checked" : "") + ">" +
+        '<span class="nome' + (it.comprado ? " strike" : "") + '">' + esc(it.nome) + "</span>" +
+        '<button class="del" data-act="del" title="Remover">✕</button>' +
+      "</label>" +
+      (it.spec ? '<div class="spec">' + esc(it.spec) + "</div>" : "") +
+      '<div class="fields">' +
+        '<div class="f"><span class="fl">estimado</span><input type="number" class="inp" data-f="est" value="' + esc(it.est) + '"></div>' +
+        '<div class="f"><span class="fl">pago</span><input type="number" class="inp" data-f="pago" placeholder="—" value="' + esc(it.pago) + '"></div>' +
+        '<div class="f grow"><span class="fl" data-role="linklbl">link de compra</span>' +
+          '<div class="linkRow"><input type="url" class="inp" data-f="link" placeholder="cole o link — a foto aparece sozinha" value="' + esc(it.link) + '">' +
+          (it.link ? '<a class="go" href="' + esc(it.link) + '" target="_blank" rel="noreferrer">ABRIR ↗</a>' : "") +
+          "</div></div>" +
+      "</div>" +
+    "</div></div></article>";
+}
+
+// eventos (delegação)
+document.getElementById("lista").addEventListener("change", e => {
+  const card = e.target.closest(".card"); if (!card) return;
+  const it = itens.find(i => i.id === card.dataset.id); if (!it) return;
+  if (e.target.dataset.act === "check") { it.comprado = e.target.checked; save(); render(); }
+});
+document.getElementById("lista").addEventListener("input", e => {
+  const card = e.target.closest(".card"); if (!card) return;
+  const it = itens.find(i => i.id === card.dataset.id); if (!it) return;
+  const f = e.target.dataset.f; if (!f) return;
+  it[f] = e.target.value; save();
+  if (f === "est" || f === "pago") atualizarTotais();
+  if (f === "link") buscarFoto(it, card);
+});
+document.getElementById("lista").addEventListener("click", e => {
+  const card = e.target.closest(".card"); if (!card) return;
+  const it = itens.find(i => i.id === card.dataset.id); if (!it) return;
+  const act = e.target.closest("[data-act]") && e.target.closest("[data-act]").dataset.act;
+  if (act === "del") { e.preventDefault(); if (confirm("Remover \"" + it.nome + "\"?")) { itens = itens.filter(i => i.id !== it.id); save(); render(); } }
+  if (act === "toggle") { it.comprado = !it.comprado; save(); render(); }
+});
+
+function atualizarTotais() {
+  const totalEst = itens.reduce((s, i) => s + (parseFloat(i.est) || 0), 0);
+  const totalPago = itens.filter(i => i.comprado).reduce((s, i) => s + (parseFloat(i.pago || i.est) || 0), 0);
+  document.getElementById("stEst").textContent = fmt(totalEst);
+  document.getElementById("stPago").textContent = fmt(totalPago);
+}
+
+let imgTimers = {};
+function buscarFoto(it, card) {
+  clearTimeout(imgTimers[it.id]);
+  if (!/^https?:\/\/.+\..+/.test(it.link)) return;
+  const lbl = card.querySelector('[data-role="linklbl"]');
+  imgTimers[it.id] = setTimeout(async () => {
+    if (lbl) lbl.textContent = "link de compra · buscando foto…";
+    card.querySelector(".thumb").classList.add("pulse");
+    const img = await fetchImage(it.link);
+    if (img) { it.img = img; save(); }
+    render();
+  }, 700);
+}
+
+document.getElementById("btnAdd").addEventListener("click", () => {
+  const nome = document.getElementById("novoNome").value.trim();
+  if (!nome) return;
+  const sel = document.getElementById("novoCat");
+  itens.push({ id: "u" + Date.now(), cat: sel.value, nome, spec: "", est: 0, pago: "", link: "", img: "", comprado: false });
+  document.getElementById("novoNome").value = "";
+  save(); render();
+});
+document.getElementById("novoNome").addEventListener("keydown", e => { if (e.key === "Enter") document.getElementById("btnAdd").click(); });
+document.getElementById("novoCat").addEventListener("change", e => { e.target.dataset.val = e.target.value; });
+document.getElementById("btnReset").addEventListener("click", () => {
+  if (!confirm("Restaurar a lista original? Isso apaga suas edições.")) return;
+  itens = JSON.parse(JSON.stringify(SEED)); save(); render();
+});
+
+// PWA: service worker + botão de instalar
+if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js");
+let deferredPrompt;
+window.addEventListener("beforeinstallprompt", e => {
+  e.preventDefault(); deferredPrompt = e;
+  document.getElementById("installBtn").style.display = "block";
+});
+document.getElementById("installBtn").addEventListener("click", async () => {
+  if (!deferredPrompt) return;
+  deferredPrompt.prompt();
+  await deferredPrompt.userChoice;
+  deferredPrompt = null;
+  document.getElementById("installBtn").style.display = "none";
+});
+
+render();
+</script>
+</body>
+</html>
